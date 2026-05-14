@@ -1,16 +1,11 @@
+import type { GullyRules } from './GullyRules';
+
 export type RunValue = 0 | 1 | 2 | 3 | 4 | 5 | 6; 
 export type HowWicket =
-| 'bowled'
-| 'caught'
-| 'lbw'
-| 'runout'
-| 'stumped'
-| 'hit-wicket'
-| 'obstructing-the-field'
-| 'hit-ball-twice'
-| 'timed-out'
-| 'one-hand-caught' // gully
-| 'hit-too-long'    // gully
+| 'bowled' | 'caught' | 'lbw' | 'runout' | 'stumped' | 'hit-wicket'
+| 'obstructing-the-field' | 'hit-ball-twice' | 'timed-out'
+| 'one-hand-caught' | 'hit-too-long';
+
 export type BallEvent = 
 | { type: 'runs'; value: RunValue}
 | { type: 'wicket';  how: HowWicket; batsmanOut: string; fielder?: string; runs?: RunValue }
@@ -21,7 +16,7 @@ export type BallEvent =
 | { type: 'penalty'; runs: 5; team: 'batting' | 'fielding' } 
 | { type: 'retired'; batsman: string; voluntary: boolean };
 
-export type PlayerRole = 'batsmen' | 'bowler' | 'all-rounder' | 'wicketkeeper'
+export type PlayerRole = 'batsman' | 'bowler' | 'all-rounder' | 'wicketkeeper'
 export type BattingStyle = 'right-hand' | 'left-hand';
 export type BowlingStyle =
 | 'right-arm-fast' | 'right-arm-medium' | 'right-arm-offbreak'| 'right-arm-legbreak' 
@@ -30,12 +25,12 @@ export type BowlingStyle =
 export interface Player {
   id: string;
   name: string;
-  imageUri?: string; // TODO: to able to add local file path or remote URL
+  imageUri?: string; 
   role: PlayerRole;
   battingStyle: BattingStyle;
   bowlingStyle: BowlingStyle;
   jerseyNumber?: number;
-  isPreset: boolean; // TODO: inorder to have some of the current teams in as preset
+  isPreset: boolean; 
 }
  
 export interface Team {
@@ -61,9 +56,9 @@ export interface FormatConfig {
     ppOvers?: number;
     superoverEnabled: boolean;
     drsEnabled: boolean;
-    noLBW: boolean; // gully customized
-    followonRuns?: number; // test customized
-    declerationAllowed?: boolean; // test customized
+    noLBW: boolean; 
+    followonRuns?: number; 
+    declerationAllowed?: boolean; 
 }
 
 export interface Venue {
@@ -77,93 +72,101 @@ export interface Venue {
 }
 
 export interface BatsmanInnings {
-  playerId: string;
-  runs: number;
-  balls: number;
-  fours: number;
+  playerId: string; 
+  runs: number; 
+  balls: number; 
+  fours: number; 
   sixes: number;
-  isOut: boolean;
-  wicketHow?: HowWicket;
-  wicketBowler?: string;
+  isOut: boolean; 
+  wicketHow?: HowWicket; 
+  wicketBowler?: string; 
   wicketFielder?: string;
-  isOnStrike: boolean;
+  isOnStrike: boolean; 
   didNotBat: boolean;
 }
  
 export interface BowlerInnings {
-  playerId: string;
-  overs: number; // completed overs
-  balls: number; // balls in current over 
+  playerId: string; 
+  overs: number; 
+  balls: number; 
   runs: number;
-  wickets: number;
-  maidens: number;
-  wides: number;
+  wickets: number; 
+  maidens: number; 
+  wides: number; 
   noballs: number;
 }
  
 export interface FallOfWicket {
-  wicketNumber: number;
-  runs: number;
-  balls: number;
-  batsmanId: string;
+  wicketNumber: number; 
+  runs: number; 
+  balls: number; 
+  batsmanId: string; 
   over: string;          
 }
  
 export interface InningsState {
-  inningsNumber: number;
-  battingTeamId: string;
+  inningsNumber: number; 
+  battingTeamId: string; 
   bowlingTeamId: string;
-  runs: number;
+  runs: number; 
   wickets: number;
-  balls: number; // legal deliveries only
-  totalDeliveries: number; // including wides/noballs
-  extras: { wides: number; noballs: number; byes: number; legbyes: number; penalties: number };
-  batsmen: Record<string, BatsmanInnings>;
+  balls: number; 
+  totalDeliveries: number; 
+  extras: { 
+    wides: number; 
+    noballs: number; 
+    byes: number; 
+    legbyes: number; 
+    penalties: number 
+  };
+  batsmen: Record<string, BatsmanInnings>; 
   bowlers: Record<string, BowlerInnings>;
-  fallOfWickets: FallOfWicket[];
-  onStrikeId: string;
-  nonStrikeId: string;
+  fallOfWickets: FallOfWicket[]; 
+  onStrikeId: string; 
+  nonStrikeId: string; 
   currentBowlerId: string;
-  target?: number;
+  target?: number; 
   isCompleted: boolean;
   completionReason?: 'all-out' | 'overs' | 'target-chased' | 'declared' | 'retired' | 'abandoned';
-  events: BallEvent[]; // full ball-by-ball log
-  overLog: BallEvent[][]; // grouped by over for display
+  events: BallEvent[]; 
+  overLog: BallEvent[][]; 
 }
- 
+
 export interface MatchMeta {
-  id: string;
-  title?: string; // optional custom name
-  format: Format;
+  id: string; 
+  title?: string; 
+  format: Format; 
   formatConfig: FormatConfig;
-  teamA: Team;
+  teamA: Team; 
   teamB: Team;
-  venue?: Venue;
-  ballType: BallType;
+  venue?: Venue; 
+  ballType: BallType; 
   pitchType?: PitchType;
-  matchDate: string;     
-  matchTime?: string;      
-  isLegacy: boolean;  // so true will be it is done, if false it is live
-  legacyNotes?: string; // match notes u can add
+  matchDate: string; 
+  matchTime?: string; 
+  isLegacy: boolean; // true = entered after the fact (history), false = scored live
+  legacyNotes?: string; 
   weatherConditions?: string;
-  tossWinnerId?: string;
-  tossDecision?: 'bat' | 'bowl';
+  gullyRules?: GullyRules; // only will be true if we need to make it into a gully
+  tossWinnerId?: string; 
+  tossDecision?: 'bat' | 'bowl'; 
   result?: MatchResult;
-  createdBy: string;       
-  createdAt: string;       
+  createdBy: string; 
+  createdAt: string; 
   updatedAt: string;
 }
  
 export interface MatchResult {
-  winnerId?: string;      
+  winnerId?: string; 
   resultType: 'win-runs' | 'win-wickets' | 'tie' | 'draw' | 'no-result' | 'super-over';
-  margin?: number;         
+  margin?: number; 
   playerOfMatch?: string;  
 }
  
 export interface MatchState {
-  meta: MatchMeta;
-  currentInnings: number;  // note: (TO-DO) 0-indexed
+  meta: MatchMeta; 
+  currentInnings: number; 
   innings: InningsState[];
   status: 'setup' | 'toss' | 'live' | 'innings-break' | 'completed' | 'abandoned';
+  battingOrder: string[][]; // battingOrder[i] = playerIds for innings i
 }
