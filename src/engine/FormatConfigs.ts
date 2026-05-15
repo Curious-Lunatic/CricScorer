@@ -31,7 +31,7 @@ export const TEST_CONFIG: FormatConfig = {
   drsEnabled: true,
   noLBW: false,
   followonRuns: 200,
-  declerationAllowed: true,
+  declarationAllowed: true,
 };
 
 export function buildCustomConfig(opts: {
@@ -50,7 +50,7 @@ export function buildCustomConfig(opts: {
     superoverEnabled: opts.superover ?? false,
     drsEnabled: false,
     noLBW: opts.noLBW ?? false,
-    declerationAllowed: opts.decleration ?? (opts.overs === 0),
+    declarationAllowed: opts.decleration ?? (opts.overs === 0),
   };
 }
 

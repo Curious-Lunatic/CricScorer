@@ -58,7 +58,7 @@ export interface FormatConfig {
     drsEnabled: boolean;
     noLBW: boolean; 
     followonRuns?: number; 
-    declerationAllowed?: boolean; 
+    declarationAllowed?: boolean; 
 }
 
 export interface Venue {
@@ -125,6 +125,8 @@ export interface InningsState {
   onStrikeId: string; 
   nonStrikeId: string; 
   currentBowlerId: string;
+  previousBowlerId?: string;
+  openers: { strikerId: string; nonStrikerId: string; bowlerId: string; };
   target?: number; 
   isCompleted: boolean;
   completionReason?: 'all-out' | 'overs' | 'target-chased' | 'declared' | 'retired' | 'abandoned';

@@ -28,6 +28,8 @@ export function createInnings(inningsNumber: number, battingTeamId: string, bowl
     inningsNumber, battingTeamId, bowlingTeamId, runs: 0, wickets: 0, balls: 0, totalDeliveries: 0,
     extras: { wides: 0, noballs: 0, byes: 0, legbyes: 0, penalties: 0 },
     batsmen: {}, bowlers: {}, fallOfWickets: [], onStrikeId: '', nonStrikeId: '', currentBowlerId: '',
+    previousBowlerId: undefined, 
+    openers: { strikerId: '', nonStrikerId: '', bowlerId: '' }, 
     target, isCompleted: false, events: [], overLog: [[]],
   };
 }
@@ -63,53 +65,90 @@ export function applyBall(innings: InningsState, event: BallEvent, config: Forma
       break;
     }
     case 'wicket': {
-      const runScored = event.runs ?? 0; next.runs += runScored; next.balls += 1; next.wickets += 1;
-      striker.runs += runScored; striker.balls += 1;
-      if (runScored === 4) striker.fours += 1; if (runScored === 6) striker.sixes += 1;
-      striker.isOut = true; striker.wicketHow = event.how; striker.wicketBowler = next.currentBowlerId; striker.wicketFielder = event.fielder;
+      const runScored = event.runs ?? 0; 
+      next.runs += runScored; 
+      next.balls += 1; 
+      next.wickets += 1;
+      striker.runs += runScored; 
+      striker.balls += 1;
+      if (runScored === 4) striker.fours += 1; 
+      if (runScored === 6) striker.sixes += 1;
+      striker.isOut = true; 
+      striker.wicketHow = event.how; 
+      striker.wicketBowler = next.currentBowlerId; 
+      striker.wicketFielder = event.fielder;
       const bowlerGetsCredit = event.how !== 'runout' && event.how !== 'obstructing-the-field';
       if (bowlerGetsCredit) bowler.wickets += 1;
-      bowler.runs += runScored; bowler.balls += 1;
+      bowler.runs += runScored; 
+      bowler.balls += 1;
       next.fallOfWickets.push({ wicketNumber: next.wickets, runs: next.runs, balls: next.balls, batsmanId: next.onStrikeId, over: formatOvers(next.balls) });
       addToOverLog(next, event);
       break;
     }
     case 'wide': {
-      const r = 1 + event.runs; next.runs += r; next.extras.wides += r; bowler.runs += r; bowler.wides += 1; addToOverLog(next, event); break;
+      const r = 1 + event.runs; 
+      next.runs += r; 
+      next.extras.wides += r; 
+      bowler.runs += r; 
+      bowler.wides += 1; 
+      addToOverLog(next, event); break;
     }
     case 'noball': {
-      const r = 1 + event.runs; next.runs += r; next.extras.noballs += 1; striker.runs += event.runs;
-      if (event.runs === 4) striker.fours += 1; if (event.runs === 6) striker.sixes += 1;
-      bowler.runs += r; bowler.noballs += 1; addToOverLog(next, event); break;
+      const r = 1 + event.runs; 
+      next.runs += r; 
+      next.extras.noballs += 1; 
+      striker.runs += event.runs;
+      striker.balls += 1
+      if (event.runs === 4) striker.fours += 1; 
+      if (event.runs === 6) striker.sixes += 1;
+      bowler.runs += r; 
+      bowler.noballs += 1; 
+      addToOverLog(next, event); break;
     }
     case 'legbye': {
-      next.runs += event.runs; next.extras.legbyes += event.runs; next.balls += 1; striker.balls += 1; bowler.balls += 1; addToOverLog(next, event); break;
+      next.runs += event.runs; 
+      next.extras.legbyes += event.runs; 
+      next.balls += 1; 
+      striker.balls += 1; 
+      bowler.balls += 1; 
+      addToOverLog(next, event); break;
     }
     case 'bye': {
-      next.runs += event.runs; next.extras.byes += event.runs; next.balls += 1; striker.balls += 1; bowler.balls += 1; addToOverLog(next, event); break;
+      next.runs += event.runs; 
+      next.extras.byes += event.runs; 
+      next.balls += 1; 
+      striker.balls += 1; 
+      bowler.balls += 1; 
+      addToOverLog(next, event); break;
     }
     case 'penalty': {
-      if (event.team === 'batting') next.runs += event.runs; next.extras.penalties += event.runs; addToOverLog(next, event); break;
+      if (event.team === 'batting') next.runs += event.runs; 
+      next.extras.penalties += event.runs; 
+      addToOverLog(next, event); break;
     }
     case 'retired': {
       const bat = ensureBatsman(next, event.batsman);
-      if (event.voluntary) { bat.isOut = true; bat.wicketHow = undefined; next.wickets += 1; }
+      if (event.voluntary) { 
+        bat.isOut = true; bat.wicketHow = undefined; next.wickets += 1; 
+        next.fallOfWickets.push({ 
+           wicketNumber: next.wickets, runs: next.runs, balls: next.balls, 
+           batsmanId: event.batsman, over: formatOvers(next.balls) 
+        });
+      }
       addToOverLog(next, event); break;
     }
-  }
+  } 
 
   const legal = isLegalDelivery(event);
   const isEndOfOver = legal && next.balls % 6 === 0 && next.balls > 0;
-  
   if (isEndOfOver) {
     bowler.overs += 1;
     bowler.balls = 0;
     if (isMaiden(next.overLog[next.overLog.length - 1])) bowler.maidens += 1;
     next.overLog.push([]);
-  } else if (legal) {
-    bowler.balls += 0;
-  }
-
+    next.previousBowlerId = next.currentBowlerId;
+    next.currentBowlerId = ''; 
+  } 
   const swap = shouldSwapStrike(event, next.balls, isEndOfOver);
   if (swap && !striker.isOut) {
     [next.onStrikeId, next.nonStrikeId] = [next.nonStrikeId, next.onStrikeId];
@@ -153,12 +192,13 @@ export function undoLast(initial: InningsState, config: FormatConfig): InningsSt
   const events = [...initial.events];
   if (events.length === 0) return initial; 
   events.pop();
+  
 
   let state = createInnings(initial.inningsNumber, initial.battingTeamId, initial.bowlingTeamId, initial.target);
-  state.onStrikeId = initial.onStrikeId;
-  state.nonStrikeId = initial.nonStrikeId;
-  state.currentBowlerId = initial.currentBowlerId;
-
+  state.onStrikeId = initial.openers.strikerId;
+  state.nonStrikeId = initial.openers.nonStrikerId;
+  state.currentBowlerId = initial.openers.bowlerId;
+  state.openers = { ...initial.openers };
   for (const [id, b] of Object.entries(initial.batsmen)) {
     state.batsmen[id] = {
       ...b, runs: 0, balls: 0, fours: 0, sixes: 0, isOut: false, didNotBat: true, isOnStrike: false,

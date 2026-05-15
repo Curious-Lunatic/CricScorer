@@ -17,12 +17,9 @@ export class MatchValidator {
     if (maxOvers > 0 && bowler.overs >= maxOvers) {
       return { valid: false, reason: 'Bowler has reached maximum allowed overs.' };
     }
-    if (innings.overLog.length > 1) {
-       const lastOverEvents = innings.overLog[innings.overLog.length - 2];
-       if (lastOverEvents.length > 0 && innings.currentBowlerId === bowlerId) {
-          return { valid: false, reason: 'Bowler cannot bowl two consecutive overs.' };
-       }
-    }
+    if (innings.previousBowlerId === bowlerId) {
+      return { valid: false, reason: 'Bowler cannot bowl two consecutive overs.' };
+    }   
     return { valid: true };
   }
 

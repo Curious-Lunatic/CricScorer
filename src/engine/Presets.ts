@@ -153,7 +153,6 @@ export const PRESET_SOUTH_AFRICA: Team = {
   ],
 };
 
-// ── IPL franchises ────────────────────────────────────────────
 
 export const PRESET_CSK: Team = {
   id: 'preset_team_csk',
@@ -221,14 +220,13 @@ export const PRESET_RCB: Team = {
   ],
 };
 
-// ── Generic gully team templates ──────────────────────────────
 
 export const GULLY_TEMPLATE_TAPE_BALL: Omit<Team, 'id' | 'players'> = {
   name: 'Tape-ball Warriors',
   shortName: 'TBW',
   primaryColor: '#2ECC71',
   secondaryColor: '#ECF0F1',
-  isPreset: false,   // user must fill players
+  isPreset: false,  
 };
 
 export const GULLY_TEMPLATE_STREET: Omit<Team, 'id' | 'players'> = {
@@ -239,7 +237,6 @@ export const GULLY_TEMPLATE_STREET: Omit<Team, 'id' | 'players'> = {
   isPreset: false,
 };
 
-// ── All presets index ─────────────────────────────────────────
 
 export const ALL_PRESET_TEAMS: Team[] = [
   PRESET_INDIA,
@@ -257,7 +254,6 @@ export const PRESET_TEAM_CATEGORIES = {
   ipl: ['preset_team_csk','preset_team_mi','preset_team_rcb'],
 };
 
-// ── Preset venues ─────────────────────────────────────────────
 
 import type { Venue } from './Types';
 
@@ -275,7 +271,6 @@ export const PRESET_VENUES: Venue[] = [
   { id:'v011', name:'Gaddafi Stadium',              city:'Lahore',       country:'Pakistan',  capacity:27000,  isPreset:true },
   { id:'v012', name:'Newlands Cricket Ground',      city:'Cape Town',    country:'S. Africa', capacity:25000,  isPreset:true },
   { id:'v013', name:'Dubai International Stadium',  city:'Dubai',        country:'UAE',       capacity:25000,  isPreset:true },
-  // Generic gully venues
   { id:'v100', name:'Local Ground',                 city:'',             country:'',          isPreset:true },
   { id:'v101', name:'School Ground',                city:'',             country:'',          isPreset:true },
   { id:'v102', name:'Society Compound',             city:'',             country:'',          isPreset:true },

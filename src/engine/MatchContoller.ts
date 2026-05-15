@@ -32,7 +32,7 @@ export class MatchController {
     const nextBowlingTeam = completedInnings.battingTeamId; 
 
     let target = undefined;
-    if (config.format === 'T20' || config.format === 'ODI' || config.format === 'Street') {
+    if (config.format === 'T20' || config.format === 'ODI' || config.format === 'Street' || config.format === "Customized") {
         target = completedInnings.runs + 1;
     }
 
